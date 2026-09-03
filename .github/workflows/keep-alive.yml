@@ -16,10 +16,7 @@ jobs:
       - name: Installation de Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
-      - name: Installation des dépendances
-        run: npm install @supabase/supabase-js
+          node-version: '22'
 
       - name: Ping Supabase
         env:
