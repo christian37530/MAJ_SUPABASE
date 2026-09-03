@@ -12,7 +12,7 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 }
 
 // Remplacez 'ma_table' par le nom d'une vraie table de votre projet.
-const TABLE = 'deco';
+const TABLE = 'decos';
 
 async function ping() {
   const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=id&limit=1`;
