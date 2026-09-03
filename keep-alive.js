@@ -1,8 +1,7 @@
 // keep-alive.js
-// Fait une requête légère à Supabase pour signaler de l'activité
+// Fait une requête légère à l'API REST de Supabase pour signaler de l'activité
 // et éviter que le projet gratuit soit suspendu pour inactivité.
-
-const { createClient } = require('@supabase/supabase-js');
+// N'utilise aucune dépendance externe : fonctionne avec le fetch natif de Node.js 18+.
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
@@ -12,21 +11,29 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Remplacez 'ma_table' par le nom d'une vraie table de votre projet.
+const TABLE = 'deco';
 
 async function ping() {
-  // Remplacez 'ma_table' par le nom d'une vraie table de votre projet.
-  // On limite à 1 ligne pour que ce soit le plus léger possible.
-  const { error } = await supabase
-    .from('deco')    .select('id')
-    .limit(1);
+  const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=id&limit=1`;
 
-  if (error) {
-    console.error('Ping échoué :', error.message);
+  const response = await fetch(url, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    console.error(`Ping échoué : ${response.status} ${response.statusText} — ${body}`);
     process.exit(1);
   }
 
   console.log(`Ping Supabase réussi le ${new Date().toISOString()}`);
 }
 
-ping();
+ping().catch((err) => {
+  console.error('Ping échoué :', err.message);
+  process.exit(1);
+});
